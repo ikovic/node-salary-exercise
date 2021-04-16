@@ -43,7 +43,11 @@ function getAllEmployees(): Employee[] {
 }
 
 describe('SalaryCalculator', () => {
-  it('should calculate the salary for regular employees', () => {
+  it('should calculate salary for regular employees', () => {
     expect(calculateSalary(employeeFirst, new Date())).toEqual(6500);
+  });
+
+  it('should calculate salary for managers', () => {
+    expect(calculateSalary(managerFirst, new Date())).toEqual(7355);
   });
 });

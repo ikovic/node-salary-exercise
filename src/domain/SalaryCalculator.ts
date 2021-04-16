@@ -1,6 +1,6 @@
 import * as currency from 'currency.js';
 
-import { Employee, EmployeeType } from './Employee';
+import { Employee, EmployeeType, Manager } from './Employee';
 
 type SalaryCalculatorStrategy = (Employee, Date) => number;
 
@@ -18,11 +18,27 @@ function calculateUnknownSalary(employee: Employee, calculationDate: Date): numb
  * @param employee
  */
 function calculateEmployeeSalary(employee: Employee, calculationDate: Date): number {
-  // we might want to provide Date through arguments so we can calculate salary on a specific date
   const tenure = employee.getTenure(calculationDate);
   const bonus = (Math.min(30, tenure * 3) + 100) / 100;
 
   return currency(employee.baseSalary).multiply(bonus).value;
+}
+
+/**
+ * base salary plus 5% for each year they have worked with the company (but not more than 40% of the base salary),
+ * plus 0.5% of salaries of their first level subordinates.
+ */
+function calculateManagerSalary(manager: Manager, calculationDate: Date): number {
+  const tenure = manager.getTenure(calculationDate);
+  const tenureBonus = (Math.min(40, tenure * 5) + 100) / 100;
+  const subordinatesBonus = currency(0.05).multiply(
+    manager.subordinates.reduce((sumOfSalaries, subordinate) => {
+      const subordinateSalary = calculateSalary(subordinate, calculationDate);
+      return currency(subordinateSalary).add(sumOfSalaries);
+    }, currency(0)),
+  );
+
+  return currency(manager.baseSalary).multiply(tenureBonus).add(subordinatesBonus).value;
 }
 
 // Would adding a new Employee type break this?
@@ -30,6 +46,8 @@ function createSalaryCalculatorStrategy(employee: Employee): SalaryCalculatorStr
   switch (employee.type) {
     case EmployeeType.Employee:
       return calculateEmployeeSalary;
+    case EmployeeType.Manager:
+      return calculateManagerSalary;
     default:
       return calculateUnknownSalary;
   }
@@ -37,6 +55,7 @@ function createSalaryCalculatorStrategy(employee: Employee): SalaryCalculatorStr
 
 // Maybe we want to make parts of this async
 export function calculateSalary(employee: Employee, calculationDate: Date): number {
+  // reusable parts of the strategy could be moved upwards
   const strategy = createSalaryCalculatorStrategy(employee);
   return strategy(employee, calculationDate);
 }
