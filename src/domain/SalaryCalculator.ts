@@ -1,6 +1,6 @@
 import * as currency from 'currency.js';
 
-import { Employee, EmployeeType, Manager } from './Employee';
+import { Employee, EmployeeType, Manager, Sales } from './Employee';
 
 type SalaryCalculatorStrategy = (Employee, Date) => number;
 
@@ -41,6 +41,23 @@ function calculateManagerSalary(manager: Manager, calculationDate: Date): number
   return currency(manager.baseSalary).multiply(tenureBonus).add(subordinatesBonus).value;
 }
 
+/**
+ * base salary plus 1% for each year they have worked with the company (but not more than 35% of the base salary)
+ * plus 0.3% of their subordinates' salaries of any level.
+ */
+function calculateSalesSalary(sales: Sales, calculationDate: Date): number {
+  const tenure = sales.getTenure(calculationDate);
+  const tenureBonus = (Math.min(35, tenure * 1) + 100) / 100;
+  const subordinatesBonus = currency(0.03).multiply(
+    sales.getAllSubordinates().reduce((sumOfSalaries, subordinate) => {
+      const subordinateSalary = calculateSalary(subordinate, calculationDate);
+      return currency(subordinateSalary).add(sumOfSalaries);
+    }, currency(0)),
+  );
+
+  return currency(sales.baseSalary).multiply(tenureBonus).add(subordinatesBonus).value;
+}
+
 // Would adding a new Employee type break this?
 function createSalaryCalculatorStrategy(employee: Employee): SalaryCalculatorStrategy {
   switch (employee.type) {
@@ -48,6 +65,8 @@ function createSalaryCalculatorStrategy(employee: Employee): SalaryCalculatorStr
       return calculateEmployeeSalary;
     case EmployeeType.Manager:
       return calculateManagerSalary;
+    case EmployeeType.Sales:
+        return calculateSalesSalary;
     default:
       return calculateUnknownSalary;
   }

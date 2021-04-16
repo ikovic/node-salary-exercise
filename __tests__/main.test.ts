@@ -12,9 +12,9 @@ const managerFirst = createManager({
   dateJoined: new Date(2014, 1, 1),
 });
 const managerSecond = createManager({
-  name: 'Manager 1',
-  subordinates: [employeeThird],
-  dateJoined: new Date(2010, 1, 1),
+  name: 'Manager 2',
+  subordinates: [employeeThird, managerFirst],
+  dateJoined: new Date(2012, 1, 1),
 });
 
 const salesFirst = createSales({
@@ -23,9 +23,14 @@ const salesFirst = createSales({
   subordinates: [employeeFirst, managerFirst],
 });
 const salesSecond = createSales({
-  name: 'Sales 1',
+  name: 'Sales 2',
   dateJoined: new Date(2016, 1, 1),
   subordinates: [managerSecond],
+});
+const theBoss = createSales({
+  name: 'The Boss',
+  dateJoined: new Date(2010, 1, 1),
+  subordinates: [salesFirst, salesSecond],
 });
 
 // in real app we would have a repository of employees
@@ -47,7 +52,23 @@ describe('SalaryCalculator', () => {
     expect(calculateSalary(employeeFirst, new Date())).toEqual(6500);
   });
 
-  it('should calculate salary for managers', () => {
+  it('should calculate salary for managers with employees as subordinates', () => {
     expect(calculateSalary(managerFirst, new Date())).toEqual(7355);
+  });
+
+  it('should calculate salary for managers with employees and managers as subordinates', () => {
+    expect(calculateSalary(managerSecond, new Date())).toEqual(7670.25);
+  });
+
+  it('should calculate salary for sales with employees and managers as subordinates', () => {
+    expect(calculateSalary(salesFirst, new Date())).toEqual(6228.65);
+  });
+
+  it('should calculate salary for sales with managers as subordinates', () => {
+    expect(calculateSalary(salesSecond, new Date())).toEqual(6245.26);
+  });
+
+  it('should calculate salary for sales with sales as subordinates', () => {
+    expect(calculateSalary(theBoss, new Date())).toEqual(7114.47);
   });
 });
