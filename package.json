@@ -33,6 +33,8 @@
   "author": "Jakub Synowiec <github@jakubsynowiec.info>",
   "license": "Apache-2.0",
   "dependencies": {
+    "currency.js": "^2.0.3",
+    "date-fns": "^2.21.1",
     "tslib": "~2.1.0"
   }
 }

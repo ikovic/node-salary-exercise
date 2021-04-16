@@ -1,4 +1,5 @@
 import { createEmployee, createManager, createSales, Employee } from '../src/domain/Employee';
+import { calculateSalary } from '../src/domain/SalaryCalculator';
 
 const employeeFirst = createEmployee({ name: 'Employee 1', dateJoined: new Date(2010, 1, 1) });
 const employeeSecond = createEmployee({ name: 'Employee 2', dateJoined: new Date(2012, 1, 1) });
@@ -43,8 +44,6 @@ function getAllEmployees(): Employee[] {
 
 describe('SalaryCalculator', () => {
   it('should calculate the salary for regular employees', () => {
-    console.log(getAllEmployees());
-
-    expect(1).toEqual(1);
+    expect(calculateSalary(employeeFirst, new Date())).toEqual(6500);
   });
 });

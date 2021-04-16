@@ -1,3 +1,5 @@
+import { differenceInYears } from 'date-fns';
+
 const BASE_SALARY = 5000;
 
 export enum EmployeeType {
@@ -11,6 +13,7 @@ export interface Employee {
   dateJoined: Date;
   baseSalary: number;
   type: EmployeeType;
+  getTenure: (Date) => number;
 }
 
 export interface Manager extends Employee {
@@ -24,7 +27,11 @@ export interface Sales extends Employee {
 
 // factory functions embed the business rules about object creation
 export function createEmployee({ name, dateJoined }: { name: string; dateJoined: Date }): Employee {
-  return { name, dateJoined, baseSalary: BASE_SALARY, type: EmployeeType.Employee };
+  function getTenure(byDate: Date): number {
+    return differenceInYears(byDate, dateJoined);
+  }
+
+  return { name, dateJoined, baseSalary: BASE_SALARY, type: EmployeeType.Employee, getTenure };
 }
 
 export function createManager({
@@ -37,9 +44,7 @@ export function createManager({
   subordinates: Employee[];
 }): Manager {
   return {
-    name,
-    dateJoined,
-    baseSalary: BASE_SALARY,
+    ...createEmployee({ name, dateJoined }),
     type: EmployeeType.Manager,
     subordinates,
   };
@@ -56,9 +61,7 @@ export function createSales({
   subordinates: Employee[];
 }): Manager {
   return {
-    name,
-    dateJoined,
-    baseSalary: BASE_SALARY,
+    ...createEmployee({ name, dateJoined }),
     type: EmployeeType.Sales,
     subordinates,
   };
