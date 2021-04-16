@@ -11,6 +11,7 @@ git clone https://github.com/ikovic/node-salary-exercise
 cd node-salary-exercise
 npm install
 ```
+
 ## Available Scripts
 
 - `clean` - remove coverage data, Jest cache and transpiled files,
@@ -20,7 +21,15 @@ npm install
 - `test` - run tests,
 - `test:watch` - interactive watch mode to automatically re-run tests
 
-## Implementation decisions
+## Problem statement
 
+There is a company; the company can have staff members. Staff members are characterized by their name, date when they joined the company, and base salary (to keep it simple, consider this value equal for all staff member types by default.)
+There are three types of staff members: Employee, Manager, Sales. Any staff member can have a supervisor. Any staff member except for Employee can have subordinates.
+Employee salary - base salary plus 3% for each year they have worked with the company, but not more than 30% of the base salary.
+Manager salary - base salary plus 5% for each year they have worked with the company (but not more than 40% of the base salary), plus 0.5% of salaries of their first level subordinates.
+Sales salary - base salary plus 1% for each year they have worked with the company (but not more than 35% of the base salary) plus 0.3% of their subordinates' salaries of any level.
+Staff members (except Employees) can have any number of subordinates of any type.
+
+## Solution
 
 [project-template]: https://github.com/jsynowiec/node-typescript-boilerplate
