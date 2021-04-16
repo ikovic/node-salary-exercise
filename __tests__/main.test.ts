@@ -1,31 +1,50 @@
-import { Delays, greeter } from '../src/main';
+import { createEmployee, createManager, createSales, Employee } from '../src/domain/Employee';
 
-describe('greeter function', () => {
-  // Read more about fake timers
-  // http://facebook.github.io/jest/docs/en/timer-mocks.html#content
-  jest.useFakeTimers();
+const employeeFirst = createEmployee({ name: 'Employee 1', dateJoined: new Date(2010, 1, 1) });
+const employeeSecond = createEmployee({ name: 'Employee 2', dateJoined: new Date(2012, 1, 1) });
+const employeeThird = createEmployee({ name: 'Employee 3', dateJoined: new Date(2014, 1, 1) });
+const employeeFourth = createEmployee({ name: 'Employee 4', dateJoined: new Date(2016, 1, 1) });
 
-  const name = 'John';
-  let hello: string;
+const managerFirst = createManager({
+  name: 'Manager 1',
+  subordinates: [employeeSecond, employeeFourth],
+  dateJoined: new Date(2014, 1, 1),
+});
+const managerSecond = createManager({
+  name: 'Manager 1',
+  subordinates: [employeeThird],
+  dateJoined: new Date(2010, 1, 1),
+});
 
-  // Act before assertions
-  beforeAll(async () => {
-    const p: Promise<string> = greeter(name);
-    jest.runOnlyPendingTimers();
-    hello = await p;
-  });
+const salesFirst = createSales({
+  name: 'Sales 1',
+  dateJoined: new Date(2012, 1, 1),
+  subordinates: [employeeFirst, managerFirst],
+});
+const salesSecond = createSales({
+  name: 'Sales 1',
+  dateJoined: new Date(2016, 1, 1),
+  subordinates: [managerSecond],
+});
 
-  // Assert if setTimeout was called properly
-  it('delays the greeting by 2 seconds', () => {
-    expect(setTimeout).toHaveBeenCalledTimes(1);
-    expect(setTimeout).toHaveBeenLastCalledWith(
-      expect.any(Function),
-      Delays.Long,
-    );
-  });
+// in real app we would have a repository of employees
+function getAllEmployees(): Employee[] {
+  return [
+    employeeFirst,
+    employeeSecond,
+    employeeThird,
+    employeeFourth,
+    managerFirst,
+    managerSecond,
+    salesFirst,
+    salesSecond,
+  ];
+}
 
-  // Assert greeter result
-  it('greets a user with `Hello, {name}` message', () => {
-    expect(hello).toBe(`Hello, ${name}`);
+describe('SalaryCalculator', () => {
+  it('should calculate the salary for regular employees', () => {
+    console.log(getAllEmployees());
+
+    expect(1).toEqual(1);
   });
 });

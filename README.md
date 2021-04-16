@@ -32,4 +32,12 @@ Staff members (except Employees) can have any number of subordinates of any type
 
 ## Solution
 
+I'll use this section of the readme to document the decision making process while solving the problem.
+
+### Creating a staff member
+
+Since each staff member type has associated business rules, we need to find the best representation for them. Since the rest of the application needs a uniform interface, I'll start with that and then see how to reduce duplication when creating objects.
+
+Remaining issue: duplication in factory functions. Also, we might want to add methods to these objects.
+
 [project-template]: https://github.com/jsynowiec/node-typescript-boilerplate
