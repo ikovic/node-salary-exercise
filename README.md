@@ -32,12 +32,22 @@ Staff members (except Employees) can have any number of subordinates of any type
 
 ## Solution
 
-I'll use this section of the readme to document the decision making process while solving the problem.
+I'll use this section of the readme to document the decision making process while solving the problem. I'll also point out the differences between the demo implementation and how a real world implementation would look like.
 
 ### Creating a staff member
 
 Since each staff member type has associated business rules, we need to find the best representation for them. Since the rest of the application needs a uniform interface, I'll start with that and then see how to reduce duplication when creating objects.
 
-Remaining issue: duplication in factory functions. Also, we might want to add methods to these objects.
+### Employee hierarchy
+
+For demo purposes, the easiest way to model this hierarchy was by storing the list of subordinates directly on the Employee object. Real world implementation would have to take more things into concern:
+- how many employees there are
+- are there any business rules that need to be enforced
+- how do we fetch the employees
+- how many other services/departments (besides salary) would depend on the employee hierarchy
+
+Extracting this relationship into a separate entity might help depending on real use cases.
+
+
 
 [project-template]: https://github.com/jsynowiec/node-typescript-boilerplate

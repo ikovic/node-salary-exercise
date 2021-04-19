@@ -1,6 +1,6 @@
 import * as currency from 'currency.js';
 
-import { Employee, EmployeeType, Manager, Sales } from './Employee';
+import { Employee, EmployeeType, Manager, Sales, getSubordinatesAcrossLevels } from './Employee';
 
 type SalaryCalculatorStrategy = (Employee, Date) => number;
 
@@ -49,7 +49,7 @@ function calculateSalesSalary(sales: Sales, calculationDate: Date): number {
   const tenure = sales.getTenure(calculationDate);
   const tenureBonus = (Math.min(35, tenure * 1) + 100) / 100;
   const subordinatesBonus = currency(0.03).multiply(
-    sales.getAllSubordinates().reduce((sumOfSalaries, subordinate) => {
+    getSubordinatesAcrossLevels(sales).reduce((sumOfSalaries, subordinate) => {
       const subordinateSalary = calculateSalary(subordinate, calculationDate);
       return currency(subordinateSalary).add(sumOfSalaries);
     }, currency(0)),
@@ -66,7 +66,7 @@ function createSalaryCalculatorStrategy(employee: Employee): SalaryCalculatorStr
     case EmployeeType.Manager:
       return calculateManagerSalary;
     case EmployeeType.Sales:
-        return calculateSalesSalary;
+      return calculateSalesSalary;
     default:
       return calculateUnknownSalary;
   }

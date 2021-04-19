@@ -1,33 +1,33 @@
-import { createEmployee, createManager, createSales, Employee } from '../src/domain/Employee';
+import { Employee, Sales, Manager } from '../src/domain/Employee';
 import { calculateSalary } from '../src/domain/SalaryCalculator';
 
-const employeeFirst = createEmployee({ name: 'Employee 1', dateJoined: new Date(2010, 1, 1) });
-const employeeSecond = createEmployee({ name: 'Employee 2', dateJoined: new Date(2012, 1, 1) });
-const employeeThird = createEmployee({ name: 'Employee 3', dateJoined: new Date(2014, 1, 1) });
-const employeeFourth = createEmployee({ name: 'Employee 4', dateJoined: new Date(2016, 1, 1) });
+const employeeFirst = new Employee({ name: 'Employee 1', dateJoined: new Date(2010, 1, 1) });
+const employeeSecond = new Employee({ name: 'Employee 2', dateJoined: new Date(2012, 1, 1) });
+const employeeThird = new Employee({ name: 'Employee 3', dateJoined: new Date(2014, 1, 1) });
+const employeeFourth = new Employee({ name: 'Employee 4', dateJoined: new Date(2016, 1, 1) });
 
-const managerFirst = createManager({
+const managerFirst = new Manager({
   name: 'Manager 1',
   subordinates: [employeeSecond, employeeFourth],
   dateJoined: new Date(2014, 1, 1),
 });
-const managerSecond = createManager({
+const managerSecond = new Manager({
   name: 'Manager 2',
   subordinates: [employeeThird, managerFirst],
   dateJoined: new Date(2012, 1, 1),
 });
 
-const salesFirst = createSales({
+const salesFirst = new Sales({
   name: 'Sales 1',
   dateJoined: new Date(2012, 1, 1),
   subordinates: [employeeFirst, managerFirst],
 });
-const salesSecond = createSales({
+const salesSecond = new Sales({
   name: 'Sales 2',
   dateJoined: new Date(2016, 1, 1),
   subordinates: [managerSecond],
 });
-const theBoss = createSales({
+const theBoss = new Sales({
   name: 'The Boss',
   dateJoined: new Date(2010, 1, 1),
   subordinates: [salesFirst, salesSecond],

@@ -8,51 +8,69 @@ export enum EmployeeType {
   Sales = 'Sales',
 }
 
-export interface Employee {
+type EmployeeArgs = {
+  name: string;
+  dateJoined: Date;
+};
+
+type EmployeeWithSubordinatesArgs = EmployeeArgs & { subordinates: Employee[] };
+
+export class Employee {
   name: string;
   dateJoined: Date;
   baseSalary: number;
   type: EmployeeType;
-  getTenure: (Date) => number;
-}
 
-export interface Manager extends Employee {
-  subordinates: Employee[];
-}
+  constructor({ name, dateJoined }: EmployeeArgs) {
+    this.name = name;
+    this.dateJoined = dateJoined;
 
-export interface Sales extends Employee {
-  // there might be more differences but to keep it simple for now it's the same as Manager
-  subordinates: Employee[];
-  getAllSubordinates: () => Employee[];
-}
+    // hardcoded for simplicity
+    this.baseSalary = BASE_SALARY;
 
-// factory functions embed the business rules about object creation
-export function createEmployee({ name, dateJoined }: { name: string; dateJoined: Date }): Employee {
-  function getTenure(byDate: Date): number {
-    return differenceInYears(byDate, dateJoined);
+    this.type = EmployeeType.Employee;
   }
 
-  return { name, dateJoined, baseSalary: BASE_SALARY, type: EmployeeType.Employee, getTenure };
+  getTenure(byDate: Date): number {
+    return differenceInYears(byDate, this.dateJoined);
+  }
 }
 
-export function createManager({
-  name,
-  dateJoined,
-  subordinates,
-}: {
-  name: string;
-  dateJoined: Date;
+class EmployeeWithSubordinates extends Employee {
   subordinates: Employee[];
-}): Manager {
-  return {
-    ...createEmployee({ name, dateJoined }),
-    type: EmployeeType.Manager,
-    subordinates,
-  };
+
+  constructor({ name, dateJoined, subordinates }: EmployeeWithSubordinatesArgs) {
+    super({ name, dateJoined });
+
+    this.subordinates = subordinates;
+  }
 }
 
-type EmployeeWithSubordinates = Manager | Sales;
-function getSubordinatesAcrossLevels(employee: EmployeeWithSubordinates) {
+export class Manager extends EmployeeWithSubordinates {
+  subordinates: Employee[];
+
+  constructor({ name, dateJoined, subordinates }: EmployeeWithSubordinatesArgs) {
+    super({ name, dateJoined, subordinates });
+
+    this.type = EmployeeType.Manager;
+  }
+}
+
+export class Sales extends EmployeeWithSubordinates {
+  subordinates: Employee[];
+
+  constructor({ name, dateJoined, subordinates }: EmployeeWithSubordinatesArgs) {
+    super({ name, dateJoined, subordinates });
+
+    this.type = EmployeeType.Sales;
+  }
+}
+
+/**
+ * Naive implementation, real world implementation would have to be improved.
+ * This would probably be a separate service, dealing only with company hierarchy.
+ */
+export function getSubordinatesAcrossLevels(employee: EmployeeWithSubordinates): Employee[] {
   return Object.values(
     employee.subordinates.reduce((allSubordinates, subordinate) => {
       // make sure subordinates are unique - we treat name as ID for simplicity
@@ -85,31 +103,4 @@ function getSubordinatesAcrossLevels(employee: EmployeeWithSubordinates) {
       }
     }, {}),
   );
-}
-
-// get rid of duplication as we go
-export function createSales({
-  name,
-  dateJoined,
-  subordinates,
-}: {
-  name: string;
-  dateJoined: Date;
-  subordinates: Employee[];
-}): Sales {
-  const sales = {
-    ...createEmployee({ name, dateJoined }),
-    type: EmployeeType.Sales,
-    subordinates,
-  };
-
-  // we'll want to extract this responsibility somewhere else
-  function getAllSubordinates(): Employee[] {
-    return getSubordinatesAcrossLevels(sales);
-  }
-
-  return {
-    ...sales,
-    getAllSubordinates,
-  };
 }
