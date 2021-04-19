@@ -69,6 +69,7 @@ export class Sales extends EmployeeWithSubordinates {
 /**
  * Naive implementation, real world implementation would have to be improved.
  * This would probably be a separate service, dealing only with company hierarchy.
+ * Adding more employee types would introduce silent bugs.
  */
 export function getSubordinatesAcrossLevels(employee: EmployeeWithSubordinates): Employee[] {
   return Object.values(

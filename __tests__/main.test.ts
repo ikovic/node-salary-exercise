@@ -1,5 +1,5 @@
 import { Employee, Sales, Manager } from '../src/domain/Employee';
-import { calculateSalary } from '../src/domain/SalaryCalculator';
+import { batchCalculateSalary, SalaryCalculator } from '../src/domain/SalaryCalculator';
 
 const employeeFirst = new Employee({ name: 'Employee 1', dateJoined: new Date(2010, 1, 1) });
 const employeeSecond = new Employee({ name: 'Employee 2', dateJoined: new Date(2012, 1, 1) });
@@ -36,39 +36,47 @@ const theBoss = new Sales({
 // in real app we would have a repository of employees
 function getAllEmployees(): Employee[] {
   return [
+    salesFirst,
+    salesSecond,
+    managerFirst,
+    managerSecond,
     employeeFirst,
     employeeSecond,
     employeeThird,
     employeeFourth,
-    managerFirst,
-    managerSecond,
-    salesFirst,
-    salesSecond,
   ];
 }
 
 describe('SalaryCalculator', () => {
+  const calc = new SalaryCalculator(new Date());
+
   it('should calculate salary for regular employees', () => {
-    expect(calculateSalary(employeeFirst, new Date())).toEqual(6500);
+    expect(calc.calculate(employeeFirst)).toEqual(6500);
   });
 
   it('should calculate salary for managers with employees as subordinates', () => {
-    expect(calculateSalary(managerFirst, new Date())).toEqual(7355);
+    expect(calc.calculate(managerFirst)).toEqual(7355);
   });
 
   it('should calculate salary for managers with employees and managers as subordinates', () => {
-    expect(calculateSalary(managerSecond, new Date())).toEqual(7670.25);
+    expect(calc.calculate(managerSecond)).toEqual(7670.25);
   });
 
   it('should calculate salary for sales with employees and managers as subordinates', () => {
-    expect(calculateSalary(salesFirst, new Date())).toEqual(6228.65);
+    expect(calc.calculate(salesFirst)).toEqual(6228.65);
   });
 
   it('should calculate salary for sales with managers as subordinates', () => {
-    expect(calculateSalary(salesSecond, new Date())).toEqual(6245.26);
+    expect(calc.calculate(salesSecond)).toEqual(6245.26);
   });
 
   it('should calculate salary for sales with sales as subordinates', () => {
-    expect(calculateSalary(theBoss, new Date())).toEqual(7114.47);
+    expect(calc.calculate(theBoss)).toEqual(7114.47);
+  });
+});
+
+describe('BatchSalaryCalculator', () => {
+  it('should calculate the salary for the provided collection of employees', () => {
+    expect(batchCalculateSalary(getAllEmployees(), new Date())).toEqual(52149.16);
   });
 });
