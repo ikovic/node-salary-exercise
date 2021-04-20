@@ -12,6 +12,8 @@ cd node-salary-exercise
 npm install
 ```
 
+Application does not have an interface, use cases can be run by executing tests as described below.
+
 ## Available Scripts
 
 - `clean` - remove coverage data, Jest cache and transpiled files,
@@ -36,7 +38,9 @@ I'll use this section of the readme to document the decision making process whil
 
 ### Creating a staff member
 
-Since each staff member type has associated business rules, we need to find the best representation for them. Since the rest of the application needs a uniform interface, I'll start with that and then see how to reduce duplication when creating objects.
+Since each staff member type has associated business rules, we need to find the best representation for them. Creating a base `Employee` class that holds the common fields and behaviour made sense to me, both from the perspective of code reuse and creating an interface that the rest of the codebase can use.
+
+Other extensions of the base class implement their peculiarities while still keeping the same interface. Real world implementation would probably involve more business rules related to object creation and adding subordinates. Subclassing this way might make the mapping between the relational database and the object model a bit more difficult.
 
 ### Employee hierarchy
 
@@ -46,8 +50,18 @@ For demo purposes, the easiest way to model this hierarchy was by storing the li
 - how do we fetch the employees
 - how many other services/departments (besides salary) would depend on the employee hierarchy
 
-Extracting this relationship into a separate entity might help depending on real use cases.
+Extracting this relationship into a separate entity (or service) might help depending on real use cases.
 
+### Fetching subordinates
 
+Depending on the implementation of the employee repository and the hierarchy, this would look much different in the real world. To simplify the implementation, in this example I traversed the employee hierarchy using recursion. This is possible since all the employees are represented as objects in memory. If we wanted to do this on the database level, we would either have to figure out an alternative representation or find a suitable mechanism for traversing tree structures.
+
+### Calculating salary
+
+Salary is calculated by first creating a `SalaryCalculator` for a specific date the salary is supposed to be calculated for. Then we can call the `calculate` method on the calculator which receives an `Employee` and synchronously returns the calculated salary. Results are cached, which solves the problem of repeated calculations of the salaray for the same employee but also introduces a problem: if you add another employee as a subordinate to another employee present in the cache, cache will go stale.
+
+I would expect this to change a lot for a real world use case. First problem is creating a blocking task - calculation is done synchronously so if this was executed on a web server it would reduce its responsiveness. Even making the function async would still drain the server resources. We could fix this by doing the calculation in a separate process or in a separate service. For a small number of employees this wouldn't be an issue.
+
+Another rough edge of this implementation is the calculation strategy - it depends on employee type, so if a new type is introduced, we would have to do a follow up update here as well.
 
 [project-template]: https://github.com/jsynowiec/node-typescript-boilerplate
